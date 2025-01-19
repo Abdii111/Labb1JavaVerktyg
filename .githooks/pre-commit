@@ -1,0 +1,20 @@
+#!/bin/bash
+# Kontrollera om någon fil i comitten är större än 5 MB
+
+MAX_SIZE=5242880  # 5 MB i bytes
+
+echo "Kontrollerar filstorlekar före commit..."
+
+for file in $(git diff --cached --name-only); do
+    if [ -f "$file" ]; then
+        FILE_SIZE=$(stat -c%s "$file")
+        if [ $FILE_SIZE -gt $MAX_SIZE ]; then
+            echo "Filen '$file' är för stor ($((FILE_SIZE / 1024 / 1024)) MB)."
+            echo "Commit stoppad. Ta bort stora filer eller lägg till dem i .gitignore."
+            exit 1
+        fi
+    fi
+done
+
+echo "Alla filer är inom tillåten storlek."
+exit 0
